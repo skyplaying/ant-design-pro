@@ -1,14 +1,14 @@
-import React from 'react';
-import { Modal } from 'antd';
 import {
+  ProFormDateTimePicker,
+  ProFormRadio,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
   StepsForm,
-  ProFormRadio,
-  ProFormDateTimePicker,
-} from '@ant-design/pro-form';
-import { useIntl, FormattedMessage } from 'umi';
+} from '@ant-design/pro-components';
+import { FormattedMessage, useIntl } from '@umijs/max';
+import { Modal } from 'antd';
+import React from 'react';
 
 export type FormValueType = {
   target?: string;
@@ -21,7 +21,7 @@ export type FormValueType = {
 export type UpdateFormProps = {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
   onSubmit: (values: FormValueType) => Promise<void>;
-  updateModalVisible: boolean;
+  updateModalOpen: boolean;
   values: Partial<API.RuleListItem>;
 };
 
@@ -36,13 +36,17 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         return (
           <Modal
             width={640}
-            bodyStyle={{ padding: '32px 40px 48px' }}
+            styles={{
+              body: {
+                padding: '32px 40px 48px',
+              },
+            }}
             destroyOnClose
             title={intl.formatMessage({
               id: 'pages.searchTable.updateForm.ruleConfig',
               defaultMessage: '规则配置',
             })}
-            visible={props.updateModalVisible}
+            open={props.updateModalOpen}
             footer={submitter}
             onCancel={() => {
               props.onCancel();

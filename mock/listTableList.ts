@@ -1,6 +1,5 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+import dayjs from 'dayjs';
 import { Request, Response } from 'express';
-import moment from 'moment';
 import { parse } from 'url';
 
 // mock tableListDataSource
@@ -22,8 +21,8 @@ const genList = (current: number, pageSize: number) => {
       desc: '这是一段描述',
       callNo: Math.floor(Math.random() * 1000),
       status: Math.floor(Math.random() * 10) % 4,
-      updatedAt: moment().format('YYYY-MM-DD'),
-      createdAt: moment().format('YYYY-MM-DD'),
+      updatedAt: dayjs().format('YYYY-MM-DD'),
+      createdAt: dayjs().format('YYYY-MM-DD'),
       progress: Math.ceil(Math.random() * 100),
     });
   }
@@ -49,20 +48,22 @@ function getRule(req: Request, res: Response, u: string) {
     ((current as number) - 1) * (pageSize as number),
     (current as number) * (pageSize as number),
   );
-  const sorter = JSON.parse(params.sorter || ('{}' as any));
-  if (sorter) {
+  if (params.sorter) {
+    const sorter = JSON.parse(params.sorter);
     dataSource = dataSource.sort((prev, next) => {
       let sortNumber = 0;
-      Object.keys(sorter).forEach((key) => {
+      (Object.keys(sorter) as Array<keyof API.RuleListItem>).forEach((key) => {
+        let nextSort = next?.[key] as number;
+        let preSort = prev?.[key] as number;
         if (sorter[key] === 'descend') {
-          if (prev[key] - next[key] > 0) {
+          if (preSort - nextSort > 0) {
             sortNumber += -1;
           } else {
             sortNumber += 1;
           }
           return;
         }
-        if (prev[key] - next[key] > 0) {
+        if (preSort - nextSort > 0) {
           sortNumber += 1;
         } else {
           sortNumber += -1;
@@ -77,7 +78,7 @@ function getRule(req: Request, res: Response, u: string) {
     };
     if (Object.keys(filter).length > 0) {
       dataSource = dataSource.filter((item) => {
-        return Object.keys(filter).some((key) => {
+        return (Object.keys(filter) as Array<keyof API.RuleListItem>).some((key) => {
           if (!filter[key]) {
             return true;
           }
@@ -133,8 +134,8 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
           desc,
           callNo: Math.floor(Math.random() * 1000),
           status: Math.floor(Math.random() * 10) % 2,
-          updatedAt: moment().format('YYYY-MM-DD'),
-          createdAt: moment().format('YYYY-MM-DD'),
+          updatedAt: dayjs().format('YYYY-MM-DD'),
+          createdAt: dayjs().format('YYYY-MM-DD'),
           progress: Math.ceil(Math.random() * 100),
         };
         tableListDataSource.unshift(newRule);
